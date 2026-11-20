@@ -121,19 +121,24 @@ CREATE POLICY "Public Access Academy" ON academy_store FOR ALL USING (true) WITH
           <label class="block text-xs font-extrabold uppercase tracking-wider text-slate-600 mb-1.5">Cari &amp; Pilih Nama Siswa</label>
           <input type="text" id="student-search-filter" onkeyup="filterStudentLoginDropdown()" placeholder="Ketik nama kamu..." class="w-full px-4 py-2.5 mb-2 rounded-xl border-2 border-slate-200 focus:border-blue-600 focus:outline-none text-sm font-semibold">
           <select id="registered-student-select" required class="w-full px-4 py-3 rounded-xl border-2 border-blue-200 bg-blue-50/30 focus:border-blue-600 focus:outline-none font-bold text-slate-800 text-sm"></select>
+          <input type="password" id="student-password-input" required inputmode="numeric" maxlength="12" placeholder="Masukkan sandi siswa" class="w-full mt-2 px-4 py-3 rounded-xl border-2 border-blue-200 focus:border-blue-600 focus:outline-none font-bold text-sm">
         </div>
         <button type="submit" class="w-full bg-gradient-to-r from-blue-600 to-indigo-700 text-white font-display text-lg font-bold py-3.5 rounded-2xl btn-3d">Masuk ke Kelas <i class="fas fa-arrow-right ml-1"></i></button>
       </form>
       <form id="form-teacher-login" onsubmit="handleTeacherLogin(event)" class="space-y-4 hidden">
-        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 text-xs text-amber-900"><i class="fas fa-shield-alt text-amber-600 mr-1"></i> Login Guru. Sandi awal: <b>yulia123</b>. <b>Segera ganti</b> di Panel Guru → Pengaturan.</div>
+        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-3.5 text-xs text-amber-900"><i class="fas fa-shield-alt text-amber-600 mr-1"></i> Login Guru. Sandi diberikan oleh administrator. Siswa tidak dapat melihat sandi guru.</div>
         <div><label class="block text-xs font-extrabold uppercase text-slate-600 mb-1">Nama Pengajar</label>
           <input type="text" value="MISS YULIA PERMAI BR SIHOMBING, M.Pd" readonly class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 bg-slate-50 font-bold text-slate-700 text-sm"></div>
         <div><label class="block text-xs font-extrabold uppercase text-slate-600 mb-1">Kata Sandi Guru</label>
           <input type="password" id="teacher-password-input" required placeholder="Masukkan sandi..." class="w-full px-4 py-3 rounded-xl border-2 border-slate-200 focus:border-indigo-600 focus:outline-none font-bold text-sm"></div>
         <button type="submit" class="w-full bg-gradient-to-r from-slate-800 to-indigo-900 text-white font-display text-lg font-bold py-3.5 rounded-2xl btn-3d">Buka Dashboard Guru <i class="fas fa-lock-open ml-1"></i></button>
       </form>
+      <button type="button" onclick="openAdminLogin()" class="mt-4 text-[11px] text-slate-400 hover:text-indigo-700 underline">Login administrator</button>
     </div>
   </div>
+</div>
+<div id="admin-login-modal" class="hidden fixed inset-0 z-[70] bg-slate-950/70 flex items-center justify-center p-4">
+ <div class="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl"><h3 class="font-bold text-lg mb-2">Akses Administrator</h3><p class="text-xs text-slate-500 mb-4">Akses khusus pengelola utama.</p><input id="admin-password-input" type="password" autocomplete="current-password" placeholder="Sandi administrator" class="w-full border-2 rounded-xl p-3 text-sm mb-3"><div class="flex gap-2"><button onclick="closeAdminLogin()" class="flex-1 bg-slate-100 rounded-xl py-2 text-sm font-bold">Batal</button><button onclick="handleAdminLogin()" class="flex-1 bg-indigo-700 text-white rounded-xl py-2 text-sm font-bold">Masuk</button></div></div>
 </div>
 
 <!-- ================= PORTAL ================= -->
@@ -161,6 +166,7 @@ CREATE POLICY "Public Access Academy" ON academy_store FOR ALL USING (true) WITH
     <div class="max-w-7xl mx-auto px-4 flex items-center gap-1.5 py-2 min-w-max">
       <button onclick="switchTab('home')" id="nav-home" class="nav-btn px-3.5 py-2 rounded-xl font-bold text-xs md:text-sm flex items-center gap-2 bg-blue-700 text-white shadow"><i class="fas fa-home"></i> Beranda &amp; Live Class</button>
       <button onclick="switchTab('curriculum')" id="nav-curriculum" class="nav-btn px-3.5 py-2 rounded-xl font-bold text-xs md:text-sm flex items-center gap-2 text-slate-600 hover:bg-white"><i class="fas fa-book-reader text-blue-600"></i> Kurikulum, Lagu &amp; Modul</button>
+      <button onclick="switchTab('tk')" id="nav-tk" class="nav-btn px-3.5 py-2 rounded-xl font-bold text-xs md:text-sm flex items-center gap-2 text-pink-700 bg-pink-50"><i class="fas fa-child"></i> Kelas TK</button>
       <button onclick="switchTab('aitutor')" id="nav-aitutor" class="nav-btn px-3.5 py-2 rounded-xl font-bold text-xs md:text-sm flex items-center gap-2 text-slate-600 hover:bg-white"><i class="fas fa-microphone-alt text-rose-500"></i> Tutor &amp; Pelafalan</button>
       <button onclick="switchTab('tests')" id="nav-tests" class="nav-btn px-3.5 py-2 rounded-xl font-bold text-xs md:text-sm flex items-center gap-2 text-slate-600 hover:bg-white"><i class="fas fa-tasks text-emerald-600"></i> Ujian 4-Skills, Kuis &amp; Game</button>
       <button onclick="switchTab('videos')" id="nav-videos" class="nav-btn px-3.5 py-2 rounded-xl font-bold text-xs md:text-sm flex items-center gap-2 text-slate-600 hover:bg-white"><i class="fab fa-youtube text-red-600"></i> Video &amp; Forum</button>
@@ -265,6 +271,17 @@ CREATE POLICY "Public Access Academy" ON academy_store FOR ALL USING (true) WITH
       <div id="resources-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
     </div>
   </div>
+</section>
+
+<!-- TAB TK -->
+<section id="tab-tk" class="tab-content hidden space-y-6 animate-pop">
+ <div class="rounded-3xl p-6 md:p-8 text-white shadow-xl bg-gradient-to-r from-pink-500 via-fuchsia-600 to-indigo-600"><span class="text-xs font-extrabold bg-white/20 px-3 py-1 rounded-full">LITTLE LEARNERS • TK A & TK B</span><h2 class="text-3xl font-bold mt-3">🌈 Dunia Belajar Anak TK</h2><p class="text-sm text-pink-50 mt-2">Belajar sambil bermain: mengenal angka, bentuk, warna, huruf, bunyi kata, Bahasa Inggris, membaca bertahap, dan cerita sederhana.</p></div>
+ <div class="grid md:grid-cols-3 gap-4">
+  <div class="bg-white rounded-3xl p-5 border shadow-sm"><div class="text-4xl">🔢</div><h3 class="font-bold text-lg mt-2">Matematika Ceria</h3><p class="text-xs text-slate-500">Angka 1–20, menghitung benda, tambah-kurang sederhana, pola, bentuk, ukuran dan perbandingan.</p><div class="flex flex-wrap gap-2 mt-3"><button onclick="tkMath('count')" class="bg-blue-100 text-blue-800 px-3 py-2 rounded-xl text-xs font-bold">Menghitung</button><button onclick="tkMath('add')" class="bg-emerald-100 text-emerald-800 px-3 py-2 rounded-xl text-xs font-bold">Penjumlahan</button><button onclick="tkMath('sub')" class="bg-amber-100 text-amber-800 px-3 py-2 rounded-xl text-xs font-bold">Pengurangan</button></div></div>
+  <div class="bg-white rounded-3xl p-5 border shadow-sm"><div class="text-4xl">🇬🇧</div><h3 class="font-bold text-lg mt-2">English for Kids</h3><p class="text-xs text-slate-500">Alphabet, phonics, greetings, colors, numbers, animals, family, body parts, fruits, classroom objects, actions and songs.</p><button onclick="tkEnglish()" class="mt-3 bg-indigo-600 text-white px-4 py-2 rounded-xl text-xs font-bold">Latihan Bahasa Inggris</button></div>
+  <div class="bg-white rounded-3xl p-5 border shadow-sm"><div class="text-4xl">📚</div><h3 class="font-bold text-lg mt-2">Membaca Bertahap</h3><p class="text-xs text-slate-500">Mengenal suku kata dan kata dari 2 sampai 10 huruf, dengan suara dan latihan mengeja.</p><select id="tk-reading-length" class="mt-3 w-full border rounded-xl p-2 text-sm"><option value="2">2 huruf</option><option value="3">3 huruf</option><option value="4">4 huruf</option><option value="5">5 huruf</option><option value="6">6 huruf</option><option value="7">7 huruf</option><option value="8">8 huruf</option><option value="9">9 huruf</option><option value="10">10 huruf</option></select><button onclick="tkReading()" class="mt-2 bg-pink-600 text-white px-4 py-2 rounded-xl text-xs font-bold w-full">Mulai Membaca</button></div>
+ </div>
+ <div class="grid md:grid-cols-2 gap-4"><div class="bg-white rounded-3xl p-5 border shadow-sm"><h3 class="font-bold text-lg">🧩 Area Latihan Interaktif</h3><div id="tk-activity" class="mt-3 bg-sky-50 rounded-2xl p-5 min-h-40"><p class="text-sm text-slate-500">Pilih salah satu kegiatan di atas untuk memulai.</p></div></div><div class="bg-white rounded-3xl p-5 border shadow-sm"><h3 class="font-bold text-lg">📖 Soal Cerita Anak TK</h3><p class="text-xs text-slate-500 mb-3">Dengarkan atau baca cerita, lalu jawab pertanyaannya.</p><div id="tk-story" class="bg-amber-50 rounded-2xl p-4 text-sm leading-relaxed">Mira memiliki 2 apel. Ibu memberi 1 apel lagi. Berapa apel Mira sekarang?</div><div class="flex gap-2 mt-3"><input id="tk-story-answer" type="number" min="0" placeholder="Jawaban" class="border rounded-xl px-3 py-2 w-28"><button onclick="checkTKStory()" class="bg-amber-500 text-white rounded-xl px-4 py-2 text-xs font-bold">Periksa</button><button onclick="newTKStory()" class="bg-slate-100 rounded-xl px-4 py-2 text-xs font-bold">Cerita baru</button></div><p id="tk-story-feedback" class="text-xs font-bold mt-2"></p></div></div>
 </section>
 
 <!-- TAB AI TUTOR -->
@@ -534,7 +551,7 @@ CREATE POLICY "Public Access Academy" ON academy_store FOR ALL USING (true) WITH
         <input type="hidden" id="edit-student-id" value="">
         <input type="text" id="crud-student-name" required placeholder="Nama Lengkap Siswa" class="px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-bold">
         <select id="crud-student-class" class="px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-bold bg-white">
-          <option>Kelas 1 SD</option><option>Kelas 2 SD</option><option>Kelas 3 SD</option><option>Kelas 4 SD</option><option>Kelas 5 SD</option><option>Kelas 6 SD</option><option>SMP / Junior</option></select>
+          <option>TK A</option><option>TK B</option><option>Kelas 1 SD</option><option>Kelas 2 SD</option><option>Kelas 3 SD</option><option>Kelas 4 SD</option><option>Kelas 5 SD</option><option>Kelas 6 SD</option><option>SMP / Junior</option></select>
         <select id="crud-student-level" class="px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-bold bg-white"><option>Beginner</option><option>Elementary</option><option>Intermediate</option><option>Advanced</option></select>
         <input type="text" id="crud-student-wa" required placeholder="No WA (62812...)" class="px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-bold">
         <select id="crud-student-status" class="px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs font-bold bg-white"><option value="active">Status: Aktif</option><option value="inactive">Status: Nonaktif</option></select>
@@ -673,9 +690,11 @@ CREATE POLICY "Public Access Academy" ON academy_store FOR ALL USING (true) WITH
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-200 space-y-3">
           <h3 class="text-base font-bold text-slate-800">🔐 Sandi Guru, WA &amp; Zoom</h3>
-          <div><label class="block text-[11px] font-bold text-slate-500 mb-1">Ganti Sandi Login Guru</label><input type="text" id="set-teacher-pass" placeholder="Sandi baru..." class="w-full px-3.5 py-2 rounded-xl border text-xs font-bold"></div>
+          <div id="admin-teacher-password-control" class="hidden"><label class="block text-[11px] font-bold text-slate-500 mb-1">Sandi login guru baru (khusus admin)</label><input type="password" id="set-teacher-pass" placeholder="Sandi guru baru..." class="w-full px-3.5 py-2 rounded-xl border text-xs font-bold"></div>
+          <div class="bg-blue-50 border border-blue-200 rounded-xl p-3"><p class="text-xs font-bold text-blue-900">Sandi siswa bulan ini</p><p id="teacher-student-password" class="font-mono text-xl font-extrabold text-blue-800 mt-1">•••••</p><p id="teacher-student-password-month" class="text-[10px] text-blue-700">Terlihat untuk guru/admin saja</p></div>
           <div><label class="block text-[11px] font-bold text-slate-500 mb-1">No. WhatsApp Miss Yulia (awali 62)</label><input type="text" id="set-teacher-wa" class="w-full px-3.5 py-2 rounded-xl border text-xs font-bold"></div>
           <div><label class="block text-[11px] font-bold text-slate-500 mb-1">Link Zoom Meeting</label><input type="text" id="set-zoom-url" class="w-full px-3.5 py-2 rounded-xl border text-xs font-bold"></div>
+          <div id="admin-email-endpoint-control" class="hidden"><label class="block text-[11px] font-bold text-slate-500 mb-1">URL Google Apps Script untuk notifikasi Gmail</label><input type="url" id="set-email-endpoint" placeholder="URL Web App Apps Script" class="w-full px-3.5 py-2 rounded-xl border text-xs"></div>
           <div><label class="block text-[11px] font-bold text-slate-500 mb-1">Info Zoom (ID &amp; Passcode)</label><input type="text" id="set-zoom-info" class="w-full px-3.5 py-2 rounded-xl border text-xs font-bold"></div>
           <button onclick="saveGeneralSettings()" class="bg-indigo-700 text-white font-bold px-4 py-2.5 rounded-xl text-xs btn-3d">Simpan Pengaturan</button>
         </div>
@@ -938,6 +957,9 @@ const TEACHER_FULL_NAME = "MISS YULIA PERMAI BR SIHOMBING, M.Pd";
 // Opsional: isi di sini agar semua perangkat otomatis terhubung ke Supabase tanpa link khusus.
 const BUILTIN_CFG = { url: '', key: '' };
 const DEFAULT_PASS = 'yulia123';
+const ADMIN_PASS_HASH = '5b46def70b232e316d0664bcffc0e34684d26562d9b1c79e2d93e36201c9e63a';
+let studentAuth = load('myea_student_auth', { month: new Date().toISOString().slice(0,7), password: '12345' });
+let tkStoryAnswer = 3;
 
 /* ---------- Utilitas dasar ---------- */
 const $ = id => document.getElementById(id);
@@ -1075,7 +1097,8 @@ const KEYS = {
   myea_attempts: { get: () => studentAttemptsMap, set: v => studentAttemptsMap = v, render: () => updateAttemptBadgesUI() },
   myea_xp: { get: () => xpMap, set: v => xpMap = v, render: () => updateAttemptBadgesUI() },
   myea_comments: { get: () => commentsMap, set: v => commentsMap = v, render: () => { renderLessonComments(); renderCommentModal(); } },
-  myea_pub: { get: () => pub, set: v => pub = v, render: () => { if (currentUser) refreshContactInfo(); } }
+  myea_pub: { get: () => pub, set: v => pub = v, render: () => { if (currentUser) refreshContactInfo(); } },
+  myea_student_auth: { get: () => studentAuth, set: v => studentAuth = v, render: () => renderStudentPasswordForTeacher() }
 };
 function applyKey(key, data) {
   const k = KEYS[key]; if (!k || data === undefined || data === null) return;
@@ -1110,7 +1133,7 @@ function initSupabaseIfConfigured() {
     sb.channel('academy_realtime').on('postgres_changes', { event: '*', schema: 'public', table: 'academy_store' }, p => {
       if (p.new && p.new.key && p.new.data !== undefined) applyKey(p.new.key, p.new.data);
     }).subscribe();
-    pullAllFromCloud();
+    pullAllFromCloud().then(() => rotateStudentPasswordIfNeeded());
   } catch (e) { console.warn('Supabase:', e); setCloudBadge(false); }
 }
 async function pullAllFromCloud() {
@@ -1237,10 +1260,17 @@ function handleStudentLogin(e) {
   e.preventDefault();
   const st = registeredStudents.find(s => s.id === Number($('registered-student-select').value));
   if (!st) { showToast('Nama belum terdaftar. Hubungi Miss Yulia untuk didaftarkan.', 'error'); return; }
+  if ($('student-password-input').value !== studentAuth.password) { showToast('Sandi siswa salah atau sudah diperbarui.', 'error'); return; }
   currentUser = { ...st, role: 'student' };
   localStorage.setItem('myea_session', JSON.stringify({ id: st.id }));
   launchPortal(); showToast(`Welcome, ${st.name}!`, 'success');
 }
+function openAdminLogin(){ $('admin-login-modal').classList.remove('hidden'); $('admin-password-input').value=''; }
+function closeAdminLogin(){ $('admin-login-modal').classList.add('hidden'); }
+async function handleAdminLogin(){ const h=await hashPass($('admin-password-input').value); if(h!==ADMIN_PASS_HASH){showToast('Sandi administrator salah.','error');return;} closeAdminLogin(); currentUser={name:TEACHER_FULL_NAME,studentClass:'Administrator Utama',level:'',role:'admin'}; launchPortal(); switchTab('teacher'); showToast('Akses administrator dibuka.','success'); }
+async function rotateStudentPasswordIfNeeded(){ const month=new Date().toISOString().slice(0,7); if(!studentAuth || studentAuth.month!==month){ studentAuth={month,password:String(Math.floor(10000+Math.random()*90000))}; await saveKey('myea_student_auth',studentAuth); await notifyPasswordChange('sandi siswa otomatis diperbarui', ''); } }
+function renderStudentPasswordForTeacher(){ const a=$('teacher-student-password'); if(a && currentUser && currentUser.role!=='student'){a.textContent=studentAuth.password; $('teacher-student-password-month').textContent='Berlaku untuk '+studentAuth.month+' • diperbarui otomatis setiap bulan';} }
+async function notifyPasswordChange(kind, value){ const endpoint=pub.emailEndpoint||''; if(!endpoint) { console.warn('Notifikasi Gmail belum dikonfigurasi: Apps Script URL kosong.'); return; } try { await fetch(endpoint,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({to:'tkmutiaraharapantanjungmedan@gmail.com',subject:'Perubahan sandi Miss Yulia Academy',text:`Perubahan sandi: ${kind}. Waktu: ${new Date().toLocaleString('id-ID')}. Nilai sandi tidak dikirim melalui email demi keamanan.`})}); } catch(e){console.warn('Notifikasi email gagal dikirim',e);} }
 async function checkTeacherPass(p) { return pub.passHash ? (await hashPass(p)) === pub.passHash : p === DEFAULT_PASS; }
 async function handleTeacherLogin(e) {
   e.preventDefault();
@@ -1261,7 +1291,10 @@ function refreshContactInfo() {
 }
 function launchPortal() {
   $('login-screen').classList.add('hidden'); $('main-app').classList.remove('hidden');
-  const t = currentUser.role === 'teacher';
+  const t = currentUser.role === 'teacher' || currentUser.role === 'admin';
+  $('admin-teacher-password-control').classList.toggle('hidden', currentUser.role !== 'admin');
+  $('admin-email-endpoint-control').classList.toggle('hidden', currentUser.role !== 'admin');
+  renderStudentPasswordForTeacher();
   $('header-avatar').textContent = t ? '👩‍🏫' : '🎓';
   $('header-user-name').textContent = currentUser.name;
   $('header-user-meta').textContent = t ? 'Guru Pembimbing' : `${currentUser.studentClass} • ${currentUser.level}`;
@@ -1277,7 +1310,7 @@ function launchPortal() {
 }
 function logout() {
   currentUser = null; localStorage.removeItem('myea_session'); window.speechSynthesis && window.speechSynthesis.cancel();
-  $('main-app').classList.add('hidden'); $('login-screen').classList.remove('hidden'); $('teacher-password-input').value = '';
+  $('main-app').classList.add('hidden'); $('login-screen').classList.remove('hidden'); $('teacher-password-input').value = ''; if($('student-password-input')) $('student-password-input').value='';
   backToTestLobby(); populateStudentLoginSelect();
 }
 function switchTab(tab) {
@@ -1901,19 +1934,27 @@ async function deleteResourceLink(id) { if (!confirm('Hapus materi ini?')) retur
 /* --- Pengaturan --- */
 function loadSettingsForm() {
   $('set-teacher-wa').value = pub.teacherWA; $('set-zoom-url').value = pub.zoomUrl; $('set-zoom-info').value = pub.zoomInfo || '';
-  $('sb-url-input').value = cfg.supabaseUrl || ''; $('sb-key-input').value = cfg.supabaseKey || ''; updateStudentShareLink();
+  $('set-email-endpoint').value = pub.emailEndpoint || ''; $('sb-url-input').value = cfg.supabaseUrl || ''; $('sb-key-input').value = cfg.supabaseKey || ''; updateStudentShareLink();
 }
 async function saveGeneralSettings() {
   const p = $('set-teacher-pass').value.trim(), wa = normWA($('set-teacher-wa').value), z = $('set-zoom-url').value.trim(), zi = $('set-zoom-info').value.trim();
-  const n = { ...pub }; if (p) n.passHash = await hashPass(p); if (wa) n.teacherWA = wa; if (z) n.zoomUrl = z; n.zoomInfo = zi;
-  applyKey('myea_pub', n); await saveKey('myea_pub', n); $('set-teacher-pass').value = ''; showToast('Pengaturan tersimpan!', 'success');
+  const n = { ...pub }; if (p && currentUser?.role === 'admin') { n.passHash = await hashPass(p); await notifyPasswordChange('sandi guru diperbarui', ''); } if (currentUser?.role === 'admin') n.emailEndpoint = $('set-email-endpoint').value.trim(); if (wa) n.teacherWA = wa; if (z) n.zoomUrl = z; n.zoomInfo = zi;
+  applyKey('myea_pub', n); await saveKey('myea_pub', n); $('set-teacher-pass').value = ''; if($('set-email-endpoint')) $('set-email-endpoint').value=n.emailEndpoint||''; showToast('Pengaturan tersimpan!', 'success');
 }
 function copySQLScript() { const b = $('sql-script-box'); b.select(); try { navigator.clipboard.writeText(b.value); } catch (e) { document.execCommand('copy'); } showToast('Kode SQL disalin!', 'success'); }
+
+
+function tkMath(mode){let a=Math.floor(Math.random()*9)+1,b=Math.floor(Math.random()*9)+1,op=mode==='sub'?'-':'+',ans=mode==='sub'?Math.max(a,b)-Math.min(a,b):a+b;if(mode==='sub'&&a<b)[a,b]=[b,a];if(mode==='count'){ans=a;op='';}$('tk-activity').innerHTML=`<div class="text-center"><p class="text-xs font-bold text-blue-700">${mode==='count'?'Hitung jumlah bintang': 'Hitung hasilnya'}</p><div class="text-4xl my-4">${mode==='count'?'⭐'.repeat(a):`${a} ${op} ${b} = ?`}</div><input id="tk-answer" type="number" class="border-2 rounded-xl p-3 text-center text-xl w-28" placeholder="?"><button onclick="checkTKAnswer(${ans})" class="ml-2 bg-blue-600 text-white rounded-xl px-4 py-3 text-sm font-bold">Periksa</button><p id="tk-feedback" class="text-sm font-bold mt-3"></p></div>`;}
+function checkTKAnswer(ans){$('tk-feedback').textContent=Number($('tk-answer').value)===ans?'🌟 Hebat! Jawaban benar!':'Ayo coba lagi, kamu pasti bisa!';$('tk-feedback').className='text-sm font-bold mt-3 '+(Number($('tk-answer').value)===ans?'text-emerald-700':'text-rose-600');}
+function tkEnglish(){const items=[['🍎','Apple','Apel'],['🐱','Cat','Kucing'],['🐶','Dog','Anjing'],['☀️','Sun','Matahari'],['📘','Book','Buku'],['🐟','Fish','Ikan'],['🌸','Flower','Bunga'],['🏫','School','Sekolah']];const x=items[Math.floor(Math.random()*items.length)];$('tk-activity').innerHTML=`<div class="text-center"><div class="text-6xl">${x[0]}</div><p class="text-xl font-extrabold mt-2">${x[1]}</p><p class="text-sm text-slate-500">Artinya: ${x[2]}</p><button onclick="speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance('${x[1]}'))" class="mt-3 bg-indigo-600 text-white px-4 py-2 rounded-xl text-xs font-bold">🔊 Dengarkan</button></div>`;}
+function tkReading(){const n=Number($('tk-reading-length').value);const words={2:['bu','ku','me','di'],3:['ibu','api','tas','jam','bus','cat','dog','sun'],4:['buku','bola','sapi','meja','ikan','fish','milk'],5:['rumah','bunga','apelku','apple','grape'],6:['sekolah','kelinci','banana','yellow'],7:['bermain','keluarga','teacher','rainbow'],8:['matahari','membaca','elephant'],9:['permainan','butterfly'],10:['perpustaka','watermelon']};const pool=words[n]||[];const w=pool[Math.floor(Math.random()*pool.length)];$('tk-activity').innerHTML=`<div class="text-center"><p class="text-xs font-bold text-pink-700">Baca kata ${n} huruf</p><div class="text-4xl md:text-5xl font-extrabold tracking-widest my-5">${w.toUpperCase()}</div><button onclick="speechSynthesis.cancel();speechSynthesis.speak(new SpeechSynthesisUtterance('${w}'))" class="bg-pink-600 text-white px-4 py-2 rounded-xl text-xs font-bold">🔊 Dengarkan kata</button><p class="text-xs text-slate-500 mt-3">Eja perlahan, lalu baca seluruh katanya.</p></div>`;}
+function newTKStory(){const a=Math.floor(Math.random()*5)+1,b=Math.floor(Math.random()*5)+1,sub=Math.random()>.5,ans=sub?Math.max(a,b)-Math.min(a,b):a+b;tkStoryAnswer=ans;const total=sub?Math.max(a,b):a,change=sub?Math.min(a,b):b;$('tk-story').textContent=sub?`Doni memiliki ${total} balon. ${change} balon terbang. Berapa balon yang tersisa?`:`Mira memiliki ${a} apel. Ibu memberi ${b} apel lagi. Berapa apel Mira sekarang?`;$('tk-story-answer').value='';$('tk-story-feedback').textContent='';}
+function checkTKStory(){const ok=Number($('tk-story-answer').value)===tkStoryAnswer;$('tk-story-feedback').textContent=ok?'🎉 Benar sekali! Kamu hebat!':'Belum tepat. Coba hitung lagi ya!';$('tk-story-feedback').className='text-xs font-bold mt-2 '+(ok?'text-emerald-700':'text-rose-600');}
 
 /* ---------- Mulai ---------- */
 window.onload = function () {
   parseHashConfig();
-  populateStudentLoginSelect(); initSupabaseIfConfigured();
+  populateStudentLoginSelect(); initSupabaseIfConfigured(); if (!sb) rotateStudentPasswordIfNeeded();
   if ('speechSynthesis' in window) speechSynthesis.getVoices();
   const s = load('myea_session', null); // lanjutkan sesi siswa setelah refresh
   if (s && s.id) { const st = registeredStudents.find(x => x.id === s.id && (x.status || 'active') === 'active'); if (st) { currentUser = { ...st, role: 'student' }; launchPortal(); } }
